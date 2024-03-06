@@ -49,7 +49,6 @@ class GraphEditor {
         if (this.selected == point) {
             this.selected = null;
         }
-        
     }
 
     display() {
