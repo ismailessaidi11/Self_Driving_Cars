@@ -38,7 +38,20 @@
             const viewport = new Viewport(myCanvas);
             const graphEditor = new GraphEditor(viewport, graph);
 
+            let oldGraphHash = graph.hash();
             animate();
+
+            function animate() { // refreshes the page continuously
+                viewport.reset();
+                if(graph.hash() != oldGraphHash) {
+                    world.generate();
+                    oldGraphHash = graph.hash();
+                }
+                world.draw(ctx);
+                ctx.globalAlpha = 0.1;
+                graphEditor.display();
+                requestAnimationFrame(animate);
+            }
 
             function dispose() {
                 graphEditor.dispose();
@@ -46,15 +59,6 @@
 
             function save() {
                 localStorage.setItem("graph", JSON.stringify(graph));
-            }
-
-            function animate() { // refreshes the page continuously
-                viewport.reset();
-                world.generate(ctx);
-                world.draw(ctx);
-                graphEditor.display();
-                
-                requestAnimationFrame(animate);
             }
 
         </script>

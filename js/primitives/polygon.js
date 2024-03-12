@@ -2,9 +2,9 @@ class Polygon {
     constructor(points) {
         this.points = points;
         this.segments = []; // segments of the polygon 
-        for (let i = 1; i < points.length; i++) {
+        for (let i = 1; i <= points.length; i++) {
             this.segments.push(
-                new Segment(points[i - 1], points[i % points.length]) // wrap the last one with % points.length
+                new Segment(points[i - 1], points[i % points.length]) // wrap the last point to fisrt  with % points.length
             );
         }
     }
@@ -50,13 +50,14 @@ class Polygon {
 
                 if (int && int.offset != 1 && int.offset != 0) { // offset = 0 means intersect at the tip 
                     const point = new Point(int.x, int.y);
-                    // removing the sub-segments inside 2 polygons
+                    // breaking a segment into 2 segemnts if intersection
                     let aux = segs1[i].p2;
-                    segs1[i].p2 = point;
+                    segs1[i].p2 = point; // moves the reference of one segement
                     segs1.splice(i + 1, 0, new Segment(point, aux)); // adds a segments
+                    // same but for the other segment of the intersection
                     aux = segs2[j].p2;
-                    segs2[j].p2 = point;
-                    segs2.splice(j + 1, 0, new Segment(point, aux)); // adds a segments
+                    segs2[j].p2 = point; // moves the reference of one segement
+                    segs2.splice(j + 1, 0, new Segment(point, aux)); // adds a segments 
                 }
             }
         }
@@ -78,6 +79,25 @@ class Polygon {
             }
         }
         return intersectionCount % 2 == 1; // odd => inside and even => outside 
+    }
+
+    distanceToPoint(point) {
+        return Math.min(...this.segments.map((s) => s.distanceToPoint(point)));
+    }
+
+    distanceToPoly(poly) {
+        return Math.min(...this.points.map((p) => poly.distanceToPoint(p)));
+    }
+
+    intersectsPoly(poly) {
+        for (let s1 of this.segments) {
+            for (let s2 of poly.segments) {
+                if (getIntersection(s1.p1, s1.p2, s2.p1, s2.p2)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     drawSegments(ctx) { //to test breaking into subsegments
